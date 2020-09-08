@@ -172,6 +172,27 @@ class SentEmailModel(base_models.BaseModel):
         super(SentEmailModel, self).put(update_last_updated_time)
 
     @classmethod
+    def create_multi(
+            cls, recipient_ids, recipient_emails, sender_id, sender_email,
+            intent, subject, html_bodies, sent_datetime):
+        """Creates multiple new SentEmailModel entries.
+
+        Args:
+            recipient_ids: list(str). The user IDs of the email recipients.
+            recipient_emails: list(str). The email addresses of the recipients.
+            sender_id: str. The user ID of the email sender.
+            sender_email: str. The email address used to send the emails.
+            intent: str. The intent string, i.e. the purpose of the emails.
+            subject: str. The subject line of the emails.
+            html_bodies: list(str). The HTML content of the email bodies.
+            sent_datetime: datetime.datetime. The datetime the emails were
+                sent, in UTC.
+        """
+
+
+
+
+    @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
         """Returns all messages with a given email_hash.
 
