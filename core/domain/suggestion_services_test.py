@@ -22,6 +22,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
@@ -1126,7 +1127,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.editor, self.EXP_ID, self.owner_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
             'content', '<p>new content</p>').to_dict()
@@ -1300,7 +1301,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3

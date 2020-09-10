@@ -42,6 +42,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -1086,10 +1087,10 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
             collection_models.CollectionRightsModel.get_by_id('0'))
@@ -1177,7 +1178,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -1398,7 +1399,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
             'cmd': 'change_collection_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'old_status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, {
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'
@@ -1873,7 +1874,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
         collection_services.update_collection(
             self.contributor_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -1882,7 +1883,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             }], 'Changes.')
 
         rights_manager.assign_role_for_collection(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
@@ -1961,7 +1962,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -3724,10 +3725,10 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = exp_models.ExplorationRightsModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationRightsModel.get_by_id('1')
@@ -3827,7 +3828,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -4033,7 +4034,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
             'cmd': 'change_exploration_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'old_status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, {
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'
@@ -4473,7 +4474,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
         exp_services.update_exploration(
             self.contributor_id, '0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -4482,7 +4483,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         rating_services.assign_rating_to_exploration(self.user_id, '0', 3)
         rating_services.assign_rating_to_exploration(self.viewer_id, '0', 4)
@@ -4584,7 +4585,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -7116,9 +7117,9 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
-
         expected_output = [
             u'[u\'fully-validated SkillModel\', 5]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7211,6 +7212,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
+        self.process_and_flush_pending_tasks()
         skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-0-1').delete()
 
@@ -7359,6 +7361,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7563,6 +7566,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotContentModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7719,6 +7723,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7963,6 +7968,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSummaryModel\', 3]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -9213,7 +9219,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['0'],
-                'inapplicable_misconception_ids': ['skillid-0']
+                'inapplicable_skill_misconception_ids': ['skillid-0']
             },
             'skill_id': '0',
             'skill_difficulty': 0.3,
@@ -13145,8 +13151,6 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
 
 class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    USER_PIN = '123'
 
     def setUp(self):
         super(UserAuthDetailsModelValidatorTests, self).setUp()
