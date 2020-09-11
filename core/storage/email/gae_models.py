@@ -182,25 +182,35 @@ class SentEmailModel(base_models.BaseModel):
         super(SentEmailModel, self).put(update_last_updated_time)
 
     @classmethod
-    def create_multi(
-            cls, recipient_ids, recipient_emails, sender_id, sender_email,
-            intent, subject, html_bodies, sent_datetime):
-        """Creates multiple new SentEmailModel entries.
+    def create_multi(cls, send_email_infos):
+        """Creates new SentEmailModel entries for multiple emails.
 
         Args:
-            recipient_ids: list(str). The user IDs of the email recipients.
-            recipient_emails: list(str). The email addresses of the recipients.
-            sender_id: str. The user ID of the email sender.
-            sender_email: str. The email address used to send the emails.
-            intent: str. The intent string, i.e. the purpose of the emails.
-            subject: str. The subject line of the emails.
-            html_bodies: list(str). The HTML content of the email bodies.
-            sent_datetime: datetime.datetime. The datetime the emails were
-                sent, in UTC.
+            send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
+                contains the information needed to generate a SentEmailModel.
         """
+        email_model_instances = []
 
+        for send_email_info in send_email_infos:
+            instance_id = cls._generate_id(send_email_info.intent)
+            email_hash = cls._generate_hash(
+                send_email_info.recipient_id, send_email_info.subject,
+                send_email_info.html_body)
 
+            email_model_instance = cls(
+                id=instance_id, recipient_id=send_email_info.recipient_id,
+                recipient_email=send_email_info.recipient_email,
+                sender_id=send_email_info.sender_id,
+                sender_email=send_email_info.sender_email,
+                intent=send_email_info.intent, subject=send_email_info.subject,
+                html_body=send_email_info.email_html_body,
+                sent_datetime=datetime.datetime.utcnow(),
+                email_hash=email_hash
+            )
 
+            email_model_instances.append(email_model_instance)
+
+        cls.put_multi(email_model_instances)
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):

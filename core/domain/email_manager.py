@@ -350,6 +350,62 @@ def _send_email(
     transaction_services.run_in_transaction(_send_email_in_transaction)
 
 
+def _send_emails(send_email_infos):
+    """Sends emails to the given recipients.
+
+    Args:
+        send_email_infos: list(SendEmailInfo). Each SendEmailInfo object
+            contains the information necessary to send an email.
+
+    Raises:
+        Exception. A sender_id is not appropriate for an intent.
+    """
+    for send_email_info in send_email_infos:
+        if send_email_info.sender_name is None:
+            send_email_info.sender_name = EMAIL_SENDER_NAME.value
+
+        require_sender_id_is_valid(
+            send_email_info.intent, send_email_info.sender_id)
+
+        if send_email_info.recipient_email is None:
+            send_email_info.recipient_email = (
+                user_services.get_email_from_user_id(
+                    send_email_info.recipient_id)
+            )
+
+        cleaned_html_body = html_cleaner.clean(send_email_info.email_html_body)
+        if cleaned_html_body != send_email_info.email_html_body:
+            log_new_error(
+                'Original email HTML body does not match cleaned HTML body:\n'
+                'Original:\n%s\n\nCleaned:\n%s\n' %
+                (send_email_info.email_html_body, cleaned_html_body))
+            return
+
+        raw_plaintext_body = cleaned_html_body.replace('<br/>', '\n').replace(
+            '<br>', '\n').replace('<li>', '<li>- ').replace(
+                '</p><p>', '</p>\n<p>')
+        cleaned_plaintext_body = html_cleaner.strip_html_tags(
+            raw_plaintext_body)
+
+        def _send_email_in_transaction(
+                send_email_info=send_email_info,
+                cleaned_plaintext_body=cleaned_plaintext_body):
+            """Sends the email to a single recipient."""
+            sender_name_email = '%s <%s>' % (
+                send_email_info.sender_name, send_email_info.sender_email)
+
+            email_services.send_mail(
+                sender_name_email, send_email_info.recipient_email,
+                send_email_info.email_subject, cleaned_plaintext_body,
+                send_email_info.email_html_body,
+                bcc_admin=send_email_info.bcc_admin,
+                reply_to_id=send_email_info.reply_to_id)
+
+        transaction_services.run_in_transaction(_send_email_in_transaction)
+
+    email_models.SentEmailModel.create_multi(send_email_infos)
+
+
 def _send_bulk_mail(
         recipient_ids, sender_id, intent, email_subject, email_html_body,
         sender_email, sender_name, instance_id):
